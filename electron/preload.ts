@@ -1,10 +1,8 @@
 import { ipcRenderer, contextBridge, webUtils } from "electron";
-import {
-  getAppVersion,
-  getDeviceSpecs,
-  getPlatform,
-} from "./utils/get-device-specs";
 import { ELECTRON_COMMANDS as C } from "../common/electron-commands";
+
+// The window is sandboxed, so this file may only `require` electron: the build folds the shared constants above
+// into this one file, and nothing here may use Node's own modules (os, fs, path).
 
 // The page can only use the channels listed here. Whatever is not on a list is refused, so a page that is
 // not ours can't reach the handlers of the main process. When a channel is added to electron/index.ts or
@@ -32,7 +30,7 @@ const INVOKE = new Set<string>([
   C.GET_DROPPED_PATH_TYPE,
   C.GET_FILE_SIZE,
   C.EXPORT_REMOVE_BACKGROUND,
-  "get-gpu-info",
+  "get-system-info",
   "get-app-version",
 ]);
 
@@ -67,6 +65,19 @@ type Listener = (...args: any) => any;
 // the page's callbacks and the listeners we registered for them, so off() can take the right one away
 const registered = new Map<Listener, Map<string, Listener>>();
 
+/** Same grouping as getPlatform() in the main process. */
+const platform = (() => {
+  switch (process.platform) {
+    case "win32":
+      return "win";
+    case "darwin":
+    case "sunos":
+      return "mac";
+    default:
+      return "linux";
+  }
+})();
+
 contextBridge.exposeInMainWorld("electron", {
   send: (command: string, payload?: any) => {
     if (!SEND.has(command)) refuse("send", command);
@@ -95,7 +106,7 @@ contextBridge.exposeInMainWorld("electron", {
     return ipcRenderer.invoke(command, payload);
   },
   getPathForFile: (file: File) => webUtils.getPathForFile(file),
-  platform: getPlatform(),
-  getSystemInfo: async () => await getDeviceSpecs(),
-  getAppVersion: async () => await getAppVersion(),
+  platform,
+  getSystemInfo: () => ipcRenderer.invoke("get-system-info"),
+  getAppVersion: () => ipcRenderer.invoke("get-app-version"),
 });
