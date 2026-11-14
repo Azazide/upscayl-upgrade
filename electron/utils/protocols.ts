@@ -77,7 +77,7 @@ export const registerProtocols = () => {
   protocol.handle("public", async (request) => {
     try {
       const filePath = path.resolve(publicRoot, "." + pathnameOf(request.url));
-      if (!filePath.startsWith(publicRoot + path.sep)) return forbidden();
+      if (!isInside(filePath, publicRoot)) return forbidden();
       return await readFile(filePath);
     } catch {
       return new Response("Bad request", { status: 400 });
