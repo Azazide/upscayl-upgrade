@@ -29,6 +29,7 @@ import getDroppedPathType from "./commands/get-dropped-path-type";
 import getFileSize from "./commands/get-file-size";
 import { registerProtocols } from "./utils/protocols";
 import { getDeviceSpecs } from "./utils/get-device-specs";
+import engineInfo from "./commands/engine-info";
 import removeBackground, {
   exportRemoveBackground,
   stopRemoveBackground,
@@ -96,6 +97,8 @@ ipcMain.handle(ELECTRON_COMMANDS.SELECT_FILE, selectFile);
 ipcMain.handle(ELECTRON_COMMANDS.GET_DROPPED_PATH_TYPE, getDroppedPathType);
 
 ipcMain.handle(ELECTRON_COMMANDS.GET_FILE_SIZE, getFileSize);
+
+ipcMain.handle(ELECTRON_COMMANDS.ENGINE_INFO, engineInfo);
 
 ipcMain.on(ELECTRON_COMMANDS.GET_MODELS_LIST, getModelsList);
 

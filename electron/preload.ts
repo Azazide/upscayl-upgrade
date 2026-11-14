@@ -30,6 +30,7 @@ const INVOKE = new Set<string>([
   C.GET_DROPPED_PATH_TYPE,
   C.GET_FILE_SIZE,
   C.EXPORT_REMOVE_BACKGROUND,
+  C.ENGINE_INFO,
   "get-system-info",
   "get-app-version",
 ]);
